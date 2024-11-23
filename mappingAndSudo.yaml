@@ -1,0 +1,38 @@
+Mappings:
+  AmiRegionMap:
+    us-east-1:
+      AMI: "ami-0453ec754f44f9a4a"
+    us-west-1:
+      AMI: "ami-038bba9a164eb3dc1"
+    eu-west-1:
+      AMI: "ami-02141377eee7defb9"
+    eu-west-2:
+      AMI: "ami-0c76bd4bd302b30ec"
+Resources:
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: !FindInMap
+        - AmiRegionMap
+        - !Ref AWS::Region
+        - AMI
+      Tags: 
+        - Key: "Name"
+          Value: !Join ["-", [my, inst, from, cloudformation]]
+      SecurityGroups:
+        - !Ref VprofileSG
+
+  VprofileSG: 
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow ssh & http to client host
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 77.252.46.123/32
